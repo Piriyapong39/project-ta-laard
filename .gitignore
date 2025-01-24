@@ -1,0 +1,2 @@
+# ignore file in user-service
+/backend/user-service/config/*
