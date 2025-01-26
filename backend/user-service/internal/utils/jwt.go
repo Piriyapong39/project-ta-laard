@@ -10,7 +10,7 @@ import (
 )
 
 func JwtSign(user models.User) (string, error) {
-	if err := godotenv.Load("../config/.env"); err != nil {
+	if err := godotenv.Load("./config/.env"); err != nil {
 		return "", err
 	}
 	JWT_SECRET_KEY := os.Getenv("JWT_SECRET_KEY")

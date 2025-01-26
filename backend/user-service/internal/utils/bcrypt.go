@@ -10,7 +10,7 @@ import (
 )
 
 func HashPassword(password string) (string, error) {
-	if err := godotenv.Load("../config/.env"); err != nil {
+	if err := godotenv.Load("./config/.env"); err != nil {
 		return "", err
 	}
 	SALTROUND, err := strconv.Atoi(os.Getenv("SALTROUND"))
