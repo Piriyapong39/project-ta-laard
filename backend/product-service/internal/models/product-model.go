@@ -14,12 +14,12 @@ type Product struct {
 
 type ResponseProduct struct {
 	ProductID    string   `json:"product_id"`
-	ProductName  string   `json:"product_name"`
+	ProductName  string   `json:"productName"`
 	Price        float64  `json:"price"`
 	Stock        int      `json:"stock"`
 	Description  string   `json:"description"`
-	MainCategory int      `json:"main_category"`
-	SubCategory  int      `json:"sub_category"`
+	MainCategory int      `json:"mainCategory"`
+	SubCategory  int      `json:"subCategory"`
 	ProductImage []string `json:"product_image"`
 }
 

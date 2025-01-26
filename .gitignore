@@ -1,5 +1,8 @@
 # ignore file in user-service
 # /backend/user-service/config/*
 
+# ignore product image
+/backend/product-service/upload/image
+
 #ignore docker-compose file
 /docker-compose.yml

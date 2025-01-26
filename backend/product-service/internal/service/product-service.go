@@ -2,11 +2,8 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"product-service/internal/models"
 	"product-service/internal/repository"
-
-	"github.com/google/uuid"
 )
 
 type ProductService struct {
@@ -18,19 +15,18 @@ func NewProductService(repo *repository.ProductRepository) *ProductService {
 }
 
 func (s *ProductService) CreateProduct(product models.Product) error {
-	uuid := uuid.New()
-	product.ProductID = uuid.String()
-	fmt.Println(product.MainCategory)
-	// if product.ProductName == "" ||
-	// 	product.Price == 0 ||
-	// 	product.Stock == 0 ||
-	// 	product.MainCategory == 0 ||
-	// 	product.SubCategory == 0 ||
-	// 	product.UserID == 0 {
-	// 	return errors.New("all fields must be filled")
-	// }
-	fmt.Println(product)
 
+	if product.ProductName == "" ||
+		product.Price == 0 ||
+		product.Stock == 0 ||
+		product.MainCategory == 0 ||
+		product.SubCategory == 0 ||
+		product.UserID == 0 {
+		return errors.New("all fields must be filled")
+	}
+	// if len(product.ProductImage) == 0 {
+	// 	product.ProductImage = []string{""}
+	// }
 	if product.Price < 0 {
 		return errors.New("price must be greater than 0")
 	}

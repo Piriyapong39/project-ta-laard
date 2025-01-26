@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"product-service/internal/models"
 	"product-service/internal/service"
+	"product-service/internal/utils"
+	"strings"
 
 	"product-service/internal/middlewares"
 
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 type ProductHandler struct {
@@ -29,32 +32,42 @@ func SetupProductRoute(app *fiber.App, productService *service.ProductService) {
 
 func (h *ProductHandler) CreateProduct(c *fiber.Ctx) error {
 	var product models.Product
-
-	// form, _ := c.MultipartForm()
-
-	//
-	// mainImage, _ := c.FormFile("main_image")
-	// fmt.Println(mainImage)
-
-	// subImages := form.File["sub_image"]
-	// for _, subImage := range subImages {
-	// 	fmt.Println(subImage.Filename)
-	// }
-	type NameProd struct {
-		NameProd string `json:"name_prod"`
-	}
-	var nameProd NameProd
-	err := c.BodyParser(&nameProd.NameProd)
-	if err != nil {
-		return c.SendStatus(fiber.ErrBadGateway.Code)
-	}
-	fmt.Printf("name prod = %s", nameProd.NameProd)
 	product.UserID = int(c.Locals("user").(models.User).UserId)
+	uuid := uuid.New()
+	product.ProductID = uuid.String()
+	form, _ := c.MultipartForm()
+
+	// upload main picture
+	mainImage, _ := c.FormFile("mainImage")
+	mainImageSplit := strings.Split(mainImage.Filename, ".")
+	newMainImageName := "main." + mainImageSplit[len(mainImageSplit)-1]
+	mainImage.Filename = newMainImageName
+	picPath, err := utils.UploadPicture(mainImage, c, product.ProductID)
+	if err != nil {
+		fmt.Printf("error: %s", err)
+	}
+	product.ProductImage = append(product.ProductImage, picPath)
+
+	// upload sub image
+	subImages := form.File["subImage"]
+	for _, subImage := range subImages {
+		subImageSplit := strings.Split(subImage.Filename, ".")
+		extName := subImageSplit[len(subImageSplit)-1]
+		extNameToLowerCase := strings.ToLower(extName)
+		subImage.Filename = uuid.String() + "." + extNameToLowerCase
+		picPath, err := utils.UploadPicture(subImage, c, product.ProductID)
+		if err != nil {
+			fmt.Printf("error: %s", err)
+		}
+		product.ProductImage = append(product.ProductImage, picPath)
+	}
+
 	if err := c.BodyParser(&product); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
+
 	if err := h.productService.CreateProduct(product); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),

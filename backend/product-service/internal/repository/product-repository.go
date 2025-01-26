@@ -20,7 +20,7 @@ func (r *ProductRepository) CreateProduct(product models.Product) error {
 
 	if _, err := r.db.Exec(
 		`
-			INSERT INTO tb_product(
+			INSERT INTO tb_products(
 				product_id,
 				product_name,
 				product_desc,
@@ -39,7 +39,7 @@ func (r *ProductRepository) CreateProduct(product models.Product) error {
 		product.Stock,
 		product.MainCategory,
 		product.SubCategory,
-		product.ProductImage,
+		pq.Array(product.ProductImage),
 		product.UserID,
 	); err != nil {
 		return err
