@@ -36,10 +36,16 @@ func (h *ProductHandler) CreateProduct(c *fiber.Ctx) error {
 	product.UserID = int(c.Locals("user").(models.User).UserId)
 	uuid := uuid.New()
 	product.ProductID = uuid.String()
-	form, _ := c.MultipartForm()
+	form, err := c.MultipartForm()
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	// upload main picture
-	mainImage, _ := c.FormFile("mainImage")
+	mainImage, err := c.FormFile("mainImage")
+	if err != nil {
+		fmt.Println(err)
+	}
 	mainImageSplit := strings.Split(mainImage.Filename, ".")
 	newMainImageName := "main." + mainImageSplit[len(mainImageSplit)-1]
 	mainImage.Filename = newMainImageName
@@ -51,11 +57,12 @@ func (h *ProductHandler) CreateProduct(c *fiber.Ctx) error {
 	product.ProductImage = append(product.ProductImage, picPath)
 	// upload sub image
 	subImages := form.File["subImage"]
-	for _, subImage := range subImages {
+	for i, subImage := range subImages {
 		subImageSplit := strings.Split(subImage.Filename, ".")
 		extName := subImageSplit[len(subImageSplit)-1]
 		extNameToLowerCase := strings.ToLower(extName)
-		subImage.Filename = uuid.String() + "." + extNameToLowerCase
+		subImage.Filename = strconv.Itoa(i+1) + "." + extNameToLowerCase
+
 		picPath, err := utils.UploadPicture(subImage, c, product.ProductID)
 		if err != nil {
 			fmt.Printf("error: %s", err)

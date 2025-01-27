@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"product-service/internal/models"
+	"product-service/internal/utils"
 
 	"strconv"
 	"strings"
@@ -122,20 +123,28 @@ func (r *ProductRepository) GetProducts(productFilter models.ProductFilter, page
 }
 
 func (r *ProductRepository) DeleteProductById(productID string, userId uint) error {
-	results, err := r.db.Exec(
-		`
-			DELETE FROM tb_products
-			WHERE 1=1
-				AND product_id = $1
-				AND user_id = $2
-		`, productID, userId,
-	)
+	var productImages []string
+	err := r.db.QueryRow(`
+        DELETE FROM tb_products
+        WHERE product_id = $1 AND user_id = $2
+        RETURNING product_image
+    `, productID, userId).Scan(pq.Array(&productImages))
+
+	if err == sql.ErrNoRows {
+		return errors.New("product not found")
+	}
 	if err != nil {
 		return err
 	}
-	rowsAffected, _ := results.RowsAffected()
-	if rowsAffected == 0 {
-		return errors.New("no affected row")
+
+	for _, imagePath := range productImages {
+		if err := utils.RemoveFile(imagePath); err != nil {
+			fmt.Println(err)
+		}
+	}
+	productSplit := strings.Split(productImages[0], "/")
+	if err := utils.RemoveFile(productSplit[0]); err != nil {
+		fmt.Println(err)
 	}
 	return nil
 }
