@@ -21,7 +21,6 @@ type ProductHandler struct {
 
 func SetupProductRoute(app *fiber.App, productService *service.ProductService) {
 	handler := ProductHandler{productService: productService}
-
 	product := app.Group("/product")
 	product.Use(middlewares.Authentication)
 	product.Use(middlewares.IsSeller)
@@ -87,7 +86,6 @@ func (h *ProductHandler) GetProduct(c *fiber.Ctx) error {
 	productFilter.ProductName = c.Query("productName")
 	productFilter.MainCategory, _ = strconv.Atoi(c.Query("mainCategory"))
 	productFilter.SubCategory, _ = strconv.Atoi(c.Query("subCategory"))
-	fmt.Println(productFilter)
 
 	results, err := h.productService.GetProduct(productFilter, page, userId)
 	if err != nil {

@@ -16,9 +16,8 @@ func main() {
 	if err := godotenv.Load("../config/.env"); err != nil {
 		fmt.Println(err)
 	}
-
 	PORT := os.Getenv("PORT")
-	fmt.Println(PORT)
+
 	// import db
 	db, err := config.Connection()
 	if err != nil {
