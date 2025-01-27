@@ -41,6 +41,7 @@ func (h *ProductHandler) CreateProduct(c *fiber.Ctx) error {
 		fmt.Println(err)
 	}
 
+	// ----------------------------------------------- Bug start here -----------------------------------------------------
 	// upload main picture
 	mainImage, err := c.FormFile("mainImage")
 	if err != nil {
@@ -69,6 +70,9 @@ func (h *ProductHandler) CreateProduct(c *fiber.Ctx) error {
 		}
 		product.ProductImage = append(product.ProductImage, picPath)
 	}
+
+	// ----------------------------------------------- Bug end here -----------------------------------------------------
+
 	if err := c.BodyParser(&product); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
