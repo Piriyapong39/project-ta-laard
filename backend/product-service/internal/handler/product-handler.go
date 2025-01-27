@@ -48,8 +48,8 @@ func (h *ProductHandler) CreateProduct(c *fiber.Ctx) error {
 	if err != nil {
 		fmt.Printf("error: %s", err)
 	}
-	product.ProductImage = append(product.ProductImage, picPath)
 
+	product.ProductImage = append(product.ProductImage, picPath)
 	// upload sub image
 	subImages := form.File["subImage"]
 	for _, subImage := range subImages {
@@ -63,13 +63,11 @@ func (h *ProductHandler) CreateProduct(c *fiber.Ctx) error {
 		}
 		product.ProductImage = append(product.ProductImage, picPath)
 	}
-
 	if err := c.BodyParser(&product); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
-
 	if err := h.productService.CreateProduct(product); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -113,10 +111,8 @@ func (h *ProductHandler) GetProduct(c *fiber.Ctx) error {
 }
 
 func (h *ProductHandler) DeleteProduct(c *fiber.Ctx) error {
-
 	var product models.Product
 	userId := c.Locals("user").(models.User).UserId
-
 	if err := c.BodyParser(&product); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
@@ -131,7 +127,6 @@ func (h *ProductHandler) DeleteProduct(c *fiber.Ctx) error {
 		"message": "delete product success",
 	})
 }
-
 func (h *ProductHandler) InactivateProductById(c *fiber.Ctx) error {
 	var product models.Product
 	userId := c.Locals("user").(models.User).UserId
@@ -170,4 +165,18 @@ func (h *ProductHandler) ActivateProduct(c *fiber.Ctx) error {
 	})
 }
 
-// func (h *ProductHandler) UpdateProduct()
+func (h *ProductHandler) UpdateProduct(c *fiber.Ctx) error {
+	userId := c.Locals("user").(models.User).UserId
+	var product models.Product
+	if err := c.BodyParser(&product); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	if err := h.productService.UpdateProduct(product, userId); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	return nil
+}

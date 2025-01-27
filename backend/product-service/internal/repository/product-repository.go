@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"product-service/internal/models"
 
+	"strconv"
+	"strings"
+
 	"github.com/lib/pq"
 )
 
@@ -184,4 +187,41 @@ func (r *ProductRepository) ActivateProduct(productId string, userId uint) error
 		return errors.New("no affected row")
 	}
 	return nil
+}
+
+func (r *ProductRepository) UpdateProduct(product models.Product, userId uint) error {
+	var setStatements []string
+	params := []interface{}{userId}
+
+	if product.ProductName != "" {
+		params = append(params, product.ProductName)
+		setStatements = append(setStatements, "product_name = $"+strconv.Itoa(len(params)))
+	}
+
+	if product.Description != "" {
+		params = append(params, product.Description)
+		setStatements = append(setStatements, "description = $"+strconv.Itoa(len(params)))
+	}
+
+	if product.Price != 0 {
+		params = append(params, product.Price)
+		setStatements = append(setStatements, "price = $"+strconv.Itoa(len(params)))
+	}
+
+	if product.Stock != 0 {
+		params = append(params, product.Stock)
+		setStatements = append(setStatements, "stock = $"+strconv.Itoa(len(params)))
+	}
+
+	if len(setStatements) == 0 {
+		return errors.New("insert data to update")
+	}
+
+	query := `
+        UPDATE tb_products
+        SET ` + strings.Join(setStatements, ", ") + `
+        WHERE user_id = $1
+        RETURNING id`
+
+	return r.db.QueryRow(query, params...).Scan(&product.ProductID)
 }
