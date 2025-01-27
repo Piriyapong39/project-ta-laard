@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"product-service/internal/models"
 
@@ -117,27 +118,70 @@ func (r *ProductRepository) GetProducts(productFilter models.ProductFilter, page
 	return products, nil
 }
 
-func (r *ProductRepository) DeleteProductById(productID string) error {
-	if _, err := r.db.Exec(
+func (r *ProductRepository) DeleteProductById(productID string, userId uint) error {
+	results, err := r.db.Exec(
 		`
 			DELETE FROM tb_products
-			WHERE product_id = $1
-		`, productID,
-	); err != nil {
+			WHERE 1=1
+				AND product_id = $1
+				AND user_id = $2
+		`, productID, userId,
+	)
+	if err != nil {
 		return err
+	}
+	rowsAffected, _ := results.RowsAffected()
+	if rowsAffected == 0 {
+		return errors.New("no affected row")
 	}
 	return nil
 }
 
-func (r *ProductRepository) InactivateProductById(productID string) error {
-	if _, err := r.db.Exec(
+func (r *ProductRepository) InactivateProductById(productID string, userId uint) error {
+	results, err := r.db.Exec(
 		`
 			UPDATE tb_products
 			SET is_active = false
-			WHERE product_id = $1
-		`, productID,
-	); err != nil {
+			WHERE 1=1
+				AND product_id = $1
+				AND user_id = $2
+		`, productID, userId,
+	)
+	if err != nil {
 		return err
+	}
+
+	affectedRows, err := results.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if affectedRows == 0 {
+		return errors.New("no affected row")
+	}
+	return nil
+}
+
+func (r *ProductRepository) ActivateProduct(productId string, userId uint) error {
+
+	results, err := r.db.Exec(
+		`
+			UPDATE tb_products
+			SET is_active = true
+			WHERE 1=1
+				AND product_id = $1
+				AND user_id = $2
+		`, productId, userId,
+	)
+	if err != nil {
+		return err
+	}
+	affectedRows, err := results.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if affectedRows == 0 {
+		return errors.New("no affected row")
 	}
 	return nil
 }

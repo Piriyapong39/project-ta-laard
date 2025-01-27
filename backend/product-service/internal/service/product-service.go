@@ -24,9 +24,6 @@ func (s *ProductService) CreateProduct(product models.Product) error {
 		product.UserID == 0 {
 		return errors.New("all fields must be filled")
 	}
-	// if len(product.ProductImage) == 0 {
-	// 	product.ProductImage = []string{""}
-	// }
 	if product.Price < 0 {
 		return errors.New("price must be greater than 0")
 	}
@@ -49,22 +46,37 @@ func (s *ProductService) GetProduct(productFilter models.ProductFilter, page int
 	return results, nil
 }
 
-func (r *ProductService) DeleteProductById(ProductID string) error {
+func (r *ProductService) DeleteProductById(ProductID string, userId uint) error {
 	if ProductID == "" {
 		return errors.New("product id must be filled")
 	}
-	if err := r.repo.DeleteProductById(ProductID); err != nil {
+	if err := r.repo.DeleteProductById(ProductID, userId); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *ProductService) InactivateProductById(ProductID string) error {
-	if ProductID == "" {
+func (s *ProductService) InactivateProductById(productId string, userId uint) error {
+	if productId == "" {
 		return errors.New("product id must be filled")
 	}
-	if err := r.repo.InactivateProductById(ProductID); err != nil {
+	if err := s.repo.InactivateProductById(productId, userId); err != nil {
 		return err
 	}
+	return nil
+}
+
+func (s *ProductService) ActivateProduct(productId string, userId uint) error {
+	if productId == "" {
+		return errors.New("product id is required")
+	}
+	if err := s.repo.ActivateProduct(productId, userId); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *ProductService) UpdateProduct(product models.Product, userId uint) error {
+
 	return nil
 }
