@@ -15,7 +15,6 @@ func Connection() (*sql.DB, error) {
 		return nil, err
 	}
 	host := os.Getenv("DB_HOST")
-	fmt.Println(host)
 	port, err := strconv.Atoi(os.Getenv("DB_PORT"))
 	if err != nil {
 		return nil, err

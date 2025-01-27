@@ -79,26 +79,16 @@ func (h *ProductHandler) CreateProduct(c *fiber.Ctx) error {
 }
 
 func (h *ProductHandler) GetProduct(c *fiber.Ctx) error {
+
 	var productFilter models.ProductFilter
-	page, err := strconv.Atoi(c.Params("page"))
+	page, _ := strconv.Atoi(c.Params("page"))
 	userId := c.Locals("user").(models.User).UserId
-	if err != nil {
-		return err
-	}
-	productFilter.ProductID = c.Query("product_id")
-	productFilter.ProductName = c.Query("product_name")
-	productFilter.MainCategory, err = strconv.Atoi(c.Query("main_cate"))
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-	productFilter.SubCategory, err = strconv.Atoi(c.Query("sub_cate"))
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
+	productFilter.ProductID = c.Query("productId")
+	productFilter.ProductName = c.Query("productName")
+	productFilter.MainCategory, _ = strconv.Atoi(c.Query("mainCategory"))
+	productFilter.SubCategory, _ = strconv.Atoi(c.Query("subCategory"))
+	fmt.Println(productFilter)
+
 	results, err := h.productService.GetProduct(productFilter, page, userId)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -127,6 +117,7 @@ func (h *ProductHandler) DeleteProduct(c *fiber.Ctx) error {
 		"message": "delete product success",
 	})
 }
+
 func (h *ProductHandler) InactivateProductById(c *fiber.Ctx) error {
 	var product models.Product
 	userId := c.Locals("user").(models.User).UserId

@@ -24,9 +24,9 @@ type ResponseProduct struct {
 }
 
 type ProductFilter struct {
-	ProductID    string `json:"product_id"`
-	ProductName  string `json:"product_name"`
-	MainCategory int    `json:"main_category"`
-	SubCategory  int    `json:"sub_category"`
+	ProductID    string `json:"productId"`
+	ProductName  string `json:"productName"`
+	MainCategory int    `json:"mainCategory"`
+	SubCategory  int    `json:"subCategory"`
 	Page         int    `json:"page"`
 }

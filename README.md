@@ -7,3 +7,6 @@
 
     - finish user-service route         -- in progress
     
+27-1-2025
+
+    - in product-service ===> delete product route : if delete product must delete image too
