@@ -11,3 +11,4 @@
 
     - in product-service ===> delete product route : if delete product must delete image too  -- done
     - fix bug in ===> product-service ===> handler ===> createProduct ===> if != picture server crash       -- in progress
+    - add category_main and sub in image folder
